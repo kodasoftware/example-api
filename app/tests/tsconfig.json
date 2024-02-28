@@ -1,0 +1,12 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["../src/*"]
+    },
+    "verbatimModuleSyntax": false
+  },
+  "include": ["./**/*"],
+  "exclude": []
+}

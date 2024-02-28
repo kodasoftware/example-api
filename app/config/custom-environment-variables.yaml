@@ -1,0 +1,23 @@
+hostname: HOSTNAME
+
+app:
+  name: APP_NAME
+  port: APP_PORT
+  version: APP_VERSION
+
+database:
+  connection:
+    user: DB_CONNECTION_USER
+    password: DB_CONNECTION_PASSWORD
+    database: DB_CONNECTION_DATABASE
+    host: DB_CONNECTION_HOST
+    port: DB_CONNECTION_PORT
+  pool:
+    min: DB_POOL_MIN
+    max: DB_POOL_MAX
+
+log:
+  level: LOG_LEVEL
+
+cors:
+  origin: CORS_ORIGIN

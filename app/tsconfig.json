@@ -1,0 +1,13 @@
+{
+  "extends": "./node_modules/@kodasoftware/typescript/tsconfig.json",
+  "compilerOptions": {
+    "baseUrl": "./",
+    "declaration": false,
+    "outDir": "dist",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "verbatimModuleSyntax": false
+  },
+  "exclude": ["jest.config.ts", "tests"]
+}

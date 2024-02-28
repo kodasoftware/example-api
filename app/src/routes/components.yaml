@@ -1,0 +1,49 @@
+components:
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      in: header
+      name: Authorization
+      scheme: Bearer
+      bearerFormat: bearer
+
+  schemas:
+    Account:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        deleted:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
+
+    Auth:
+      type: object
+      properties:
+        accessToken:
+          type: string
+
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        account_id:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        name:
+          type: string
+        deleted:
+          type: string
+        created_at:
+          type: string
+        updated_at:
+          type: string
