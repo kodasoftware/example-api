@@ -103,18 +103,16 @@ const ACCOUNT_SCHEMA = {
  *          application/json:
  *            $ref: '#/components/schemas/Account'
  */
-export function accountRouteFactory(config: {
-  jwksUri: string;
-  cache?: boolean;
-}) {
+export function accountRouteFactory(config: { publicKey: string }) {
   const router = new Router();
   router.post(
     'createMyAccount',
     '/accounts',
     compose([
       authenticationMiddlewareFactory(config),
-      authorizationMiddlewareFactory({ permissions: { required: 'WRITE' } }),
+      authorizationMiddlewareFactory({ permission: { required: 'WRITE' } }),
       schemaMiddlewareFactory({
+        opts: { coerceTypes: false },
         schema: {
           body: {
             type: 'object',
@@ -131,26 +129,27 @@ export function accountRouteFactory(config: {
     '/accounts',
     compose([
       authenticationMiddlewareFactory(config),
-      authorizationMiddlewareFactory({ permissions: { required: 'READ' } }),
+      authorizationMiddlewareFactory({ permission: { required: 'READ' } }),
       getMyAccountMiddleware,
     ])
   );
   router.delete(
     'deleteMyAccount',
-    '/accounts/:id',
+    '/accounts',
     compose([
       authenticationMiddlewareFactory(config),
-      authorizationMiddlewareFactory({ permissions: { required: 'WRITE' } }),
+      authorizationMiddlewareFactory({ permission: { required: 'WRITE' } }),
       deleteMyAccountMiddleware,
     ])
   );
   router.patch(
     'updateMyAccount',
-    '/accounts/:id',
+    '/accounts',
     compose([
       authenticationMiddlewareFactory(config),
-      authorizationMiddlewareFactory({ permissions: { required: 'WRITE' } }),
+      authorizationMiddlewareFactory({ permission: { required: 'WRITE' } }),
       schemaMiddlewareFactory({
+        opts: { coerceTypes: false },
         schema: {
           body: {
             type: 'object',

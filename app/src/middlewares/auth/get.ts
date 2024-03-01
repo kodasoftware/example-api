@@ -11,7 +11,7 @@ export function getAuthMiddlewareFactory(config: {
   accessToken: { expiry: number };
   refreshToken: { expiry: number };
 }): Middleware<
-  { accessToken: string },
+  { accessToken: string; expiry: string },
   { auth: AuthService; db: Database; jwt: JwtService }
 > {
   return async function getAuthMiddleware(ctx) {
@@ -23,13 +23,14 @@ export function getAuthMiddlewareFactory(config: {
           email,
           password,
         })(trx);
-        const { accessToken, refreshToken } =
+        const { accessToken, refreshToken, expiry } =
           await ctx.services.jwt.getJwtFromAuth(auth);
 
-        ctx.body = { accessToken };
+        ctx.body = { accessToken, expiry: expiry.toISOString() };
         ctx.cookies.set('accessToken', accessToken, {
           signed: true,
           sameSite: true,
+          httpOnly: false,
           maxAge: config.accessToken.expiry,
         });
         ctx.cookies.set('refreshToken', refreshToken, {

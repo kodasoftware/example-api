@@ -18,6 +18,11 @@ export const updateMyAccountMiddleware: Middleware<
 
   await ctx.services.db
     .transaction<Account>(async trx => {
+      const existing = await ctx.services.account.getMyAccount(ctx.state.auth)(
+        trx
+      );
+      if (existing && existing.deleted) ctx.throw(404, 'Account not found');
+
       const account = await ctx.services.account.updateMyAccount(
         ctx.state.auth,
         { name }

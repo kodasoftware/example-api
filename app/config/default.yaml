@@ -25,8 +25,8 @@ password:
   salt: picopico
 
 jwks:
-  uri: http://localhost:9000/.well-known/jwks.json
-  cache: true
+  privateKey: picopico
+  publicKey: picopico
 
 cookie:
   keys:

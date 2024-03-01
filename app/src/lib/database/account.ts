@@ -32,8 +32,8 @@ export class Account {
     const record = await trx
       .table('accounts')
       .select('accounts.*')
-      .leftJoin('users', 'users.account_id', 'accounts.id')
-      .where('users.id', userId)
+      .leftJoin('user_accounts', 'user_accounts.account_id', 'accounts.id')
+      .where('user_accounts.user_id', userId)
       .first();
     if (!record) return null;
     return this.toAccount(record);
@@ -64,19 +64,18 @@ export class Account {
       .insert(this.toRecord())
       .onConflict('id')
       .merge(['deleted', 'name', 'updated_at'])
-      .first()
       .then(() => this);
   }
 
   public delete(trx: Knex | Knex.Transaction): Promise<Account> {
     this.updated_at = new Date();
     this.deleted = true;
+
     return trx
       .table('accounts')
       .insert(this.toRecord())
       .onConflict('id')
-      .merge(['deleted', 'name', 'updated_at'])
-      .first()
+      .merge(['deleted', 'updated_at'])
       .then(() => this);
   }
 

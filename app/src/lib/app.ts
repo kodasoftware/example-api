@@ -1,16 +1,26 @@
 import { createApplication, generateSwaggerSpec } from '@kodasoftware/api';
 import type { LogLevel } from '@kodasoftware/monitoring';
 
-import type { DatabaseConfig } from '.';
-import { AccountService, Database } from '.';
+import { Database, type DatabaseConfig } from './database';
+import {
+  AccountService,
+  AuthService,
+  JwtService,
+  UserService,
+} from './service';
 
 type Config = {
   hostname: string;
   app: { name: string; version: string };
-  cookie: { keys: string[] };
+  cookie: {
+    keys: string[];
+    access: { expiry: number };
+    refresh: { expiry: number };
+  };
   database: DatabaseConfig;
   log: { level: LogLevel };
   cors?: { origin?: string };
+  jwks: { privateKey: string; publicKey: string };
 };
 
 export function applicationFactory(config: Config) {
@@ -20,8 +30,13 @@ export function applicationFactory(config: Config) {
       logLevel: config.log.level,
       services: {
         account: new AccountService(),
+        auth: new AuthService(),
         db: new Database(config.database),
-        // user: new UserService(),
+        jwt: new JwtService(config.jwks.privateKey, config.jwks.publicKey, {
+          accessToken: { expiry: config.cookie.access.expiry },
+          refreshToken: { expiry: config.cookie.refresh.expiry },
+        }),
+        user: new UserService(),
       },
     },
     cors: { origin: config.cors?.origin },
@@ -40,6 +55,5 @@ export function applicationFactory(config: Config) {
       }),
     },
   });
-  application.context.services.db = new Database(config.database);
   return application;
 }

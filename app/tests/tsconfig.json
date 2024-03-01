@@ -7,6 +7,6 @@
     },
     "verbatimModuleSyntax": false
   },
-  "include": ["./**/*"],
+  "include": ["**/*"],
   "exclude": []
 }

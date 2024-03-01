@@ -58,8 +58,6 @@ const AUTH_SCHEMA = {
  *            $ref: '#/components/schemas/Auth'
  */
 export function authRouteFactory(config: {
-  jwksUri: string;
-  cache?: boolean;
   accessToken: { expiry: number };
   refreshToken: { expiry: number };
 }) {
@@ -69,6 +67,7 @@ export function authRouteFactory(config: {
     '/auth',
     compose([
       schemaMiddlewareFactory({
+        opts: { coerceTypes: false },
         schema: {
           body: {
             type: 'object',
@@ -85,7 +84,7 @@ export function authRouteFactory(config: {
   );
   router.get(
     'getRefreshAuth',
-    '/auth/refresh',
+    '/auth',
     compose([
       refreshAuthMiddlewareFactory({
         accessToken: config.accessToken,

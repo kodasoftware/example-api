@@ -21,15 +21,16 @@ declare module 'knex/types/tables' {
       Partial<
         Pick<
           UserRecord,
-          | 'deleted'
-          | 'updated_at'
-          | 'name'
-          | 'email'
-          | 'password'
-          | 'account_id'
+          'deleted' | 'updated_at' | 'name' | 'email' | 'password'
         >
       >,
       Omit<UserRecord, 'id' | 'created_at'>
+    >;
+    user_accounts: Knex.CompositeTableType<
+      { user_id: string; account_id: string },
+      { user_id: string; account_id: string },
+      { user_id: string; account_id: string },
+      { user_id: string; account_id: string }
     >;
   }
 }

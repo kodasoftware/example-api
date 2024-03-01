@@ -22,6 +22,7 @@ const USER_SCHEMA = {
   password: {
     type: 'string',
     format: 'password',
+    minLength: 12,
   },
   name: {
     type: 'string',
@@ -49,7 +50,6 @@ const USER_SCHEMA = {
  *        content:
  *          application/json:
  *            $ref: '#/components/schemas/User'
- * /users/me:
  *  patch:
  *    tags:
  *      - User
@@ -86,13 +86,14 @@ const USER_SCHEMA = {
  *      200:
  *        description: Return 200 response
  */
-export function meRouteFactory(config: { jwksUri: string; cache?: boolean }) {
+export function meRouteFactory(config: { publicKey: string }) {
   const router = new Router();
   router.post(
     'createMe',
     '/users',
     compose([
       schemaMiddlewareFactory({
+        opts: { coerceTypes: false },
         schema: {
           body: {
             type: 'object',
@@ -106,24 +107,30 @@ export function meRouteFactory(config: { jwksUri: string; cache?: boolean }) {
   );
   router.delete(
     'deleteMe',
-    '/users/me',
+    '/users',
     compose([
       authenticationMiddlewareFactory(config),
-      authorizationMiddlewareFactory({ permissions: { required: 'WRITE' } }),
+      authorizationMiddlewareFactory({ permission: { required: 'WRITE' } }),
       deleteMeMiddleware,
     ])
   );
   router.patch(
     'updateMe',
-    '/users/me',
+    '/users',
     compose([
       authenticationMiddlewareFactory(config),
-      authorizationMiddlewareFactory({ permissions: { required: 'WRITE' } }),
+      authorizationMiddlewareFactory({ permission: { required: 'WRITE' } }),
       schemaMiddlewareFactory({
         schema: {
+          opts: { coerceTypes: false },
           body: {
             type: 'object',
             properties: USER_SCHEMA,
+            anyOf: [
+              { required: ['email'] },
+              { required: ['password'] },
+              { required: ['name'] },
+            ],
           },
         },
       }),

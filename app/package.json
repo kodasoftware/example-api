@@ -16,7 +16,7 @@
     "start:serverless": "nodemon --exec 'ts-node' src/handler.ts",
     "compile": "tsc",
     "lint": "eslint",
-    "test": "jest",
+    "test": "jest --runInBand",
     "test:watch": "npm t -- --watch",
     "test:coverage": "npm t -- --coverage",
     "precompile": "rimraf dist"
@@ -29,6 +29,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/chance": "^1.1.6",
     "@types/config": "^3.3.3",
+    "@types/cookie": "^0.6.0",
     "@types/jest": "^29.5.12",
     "@types/knex": "^0.16.1",
     "@types/koa__router": "^12.0.4",
@@ -37,6 +38,7 @@
     "@typescript-eslint/eslint-plugin": ">=7",
     "@typescript-eslint/parser": ">=7",
     "chance": "^1.1.11",
+    "cookie": "^0.6.0",
     "eslint": ">=8",
     "eslint-config-prettier": ">=9",
     "eslint-plugin-jest": ">=27",
@@ -55,7 +57,7 @@
     "typescript": ">=5"
   },
   "dependencies": {
-    "@kodasoftware/api": "^0.0.0",
+    "@kodasoftware/api": "^0.1.2",
     "@kodasoftware/monitoring": "^0.1.0",
     "bcrypt": "^5.1.1",
     "config": "^3.3.11",

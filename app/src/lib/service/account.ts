@@ -38,7 +38,7 @@ export class AccountService {
       if (!_account) throw new NoAccountError('No account found');
       if (!account.name && !account.deleted) return _account;
       if (account.name) _account.name = account.name;
-      if (account.deleted) _account.deleted = account.deleted;
+      if (account.deleted !== undefined) _account.deleted = account.deleted;
       return await _account.save(knex);
     };
   }

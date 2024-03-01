@@ -20,7 +20,7 @@ export class UserService {
         email,
         await encryptString(password),
         name,
-        true,
+        false,
         randomUUID(),
         account_id
       );
@@ -42,7 +42,7 @@ export class UserService {
   ) {
     return async (knex: Knex | Knex.Transaction): Promise<User> => {
       let _user = await User.getUserById(auth.id, knex);
-      if (!_user) throw new NoAccountError('Account not found');
+      if (!_user || _user.deleted) throw new NoUserError('User not found');
       if (user.account_id) _user.account_id = user.account_id;
       if (user.email) _user.email = user.email;
       if (user.name) _user.name = user.name;

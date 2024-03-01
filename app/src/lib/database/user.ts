@@ -7,7 +7,6 @@ import { encryptString } from '../encrypt';
 
 export interface UserRecord extends Record {
   id: string;
-  account_id: string | null;
   email: string;
   password: string;
   name: string;
@@ -27,7 +26,12 @@ export class User {
     id: string,
     trx: Knex | Knex.Transaction
   ): Promise<User | null> {
-    const record = await trx.table('users').where('id', id).first();
+    const record = await trx
+      .table('users')
+      .select('users.*', 'user_accounts.account_id')
+      .leftJoin('user_accounts', 'user_accounts.user_id', 'users.id')
+      .where('id', id)
+      .first();
     if (!record) return null;
     return this.toUser(record);
   }
@@ -36,12 +40,17 @@ export class User {
     email: string,
     trx: Knex | Knex.Transaction
   ): Promise<User | null> {
-    const record = await trx.table('users').where('email', email).first();
+    const record = await trx
+      .table('users')
+      .select('users.*', 'user_accounts.account_id')
+      .leftJoin('user_accounts', 'user_accounts.user_id', 'users.id')
+      .where('email', email)
+      .first();
     if (!record) return null;
     return this.toUser(record);
   }
 
-  private static toUser(record: UserRecord): User {
+  private static toUser(record: UserRecord & { account_id: string }): User {
     return new User(
       record.email,
       record.password,
@@ -78,26 +87,37 @@ export class User {
       .then(() => this);
   }
 
-  public save(trx: Knex | Knex.Transaction): Promise<User> {
+  public async save(trx: Knex | Knex.Transaction): Promise<User> {
     this.updated_at = new Date();
-    return trx
+    await trx
       .table('users')
       .insert(this.toRecord())
       .onConflict('id')
-      .merge(['email', 'deleted', 'name', 'account_id', 'updated_at'])
-      .first()
-      .then(() => this);
+      .merge(['email', 'deleted', 'name', 'updated_at']);
+
+    if (this.account_id) {
+      await trx
+        .table('user_accounts')
+        .insert(
+          this.toUserAccountRecord() as { account_id: string; user_id: string }
+        )
+        .onConflict(['user_id', 'account_id'])
+        .merge(['account_id']);
+    } else
+      await trx.table('user_accounts').where({ user_id: this.id }).delete();
+
+    return this;
   }
 
   public delete(trx: Knex | Knex.Transaction): Promise<User> {
     this.updated_at = new Date();
     this.deleted = true;
+
     return trx
       .table('users')
       .insert(this.toRecord())
       .onConflict('id')
-      .merge(['email', 'deleted', 'name', 'account_id', 'updated_at'])
-      .first()
+      .merge(['email', 'deleted', 'name', 'updated_at'])
       .then(() => this);
   }
 
@@ -116,13 +136,22 @@ export class User {
   private toRecord(): UserRecord {
     return {
       id: this.id,
-      account_id: this.account_id,
       email: this.email,
       password: this.password,
       name: this.name,
       deleted: this.deleted,
       created_at: this.created_at.toISOString(),
       updated_at: this.updated_at.toISOString(),
+    };
+  }
+
+  private toUserAccountRecord(): {
+    user_id: string;
+    account_id: string | null;
+  } {
+    return {
+      user_id: this.id,
+      account_id: this.account_id,
     };
   }
 }

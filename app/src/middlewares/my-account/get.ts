@@ -16,8 +16,12 @@ export const getMyAccountMiddleware: Middleware<
   await ctx.services.account
     .getMyAccount(ctx.state.auth)(ctx.services.db.connection)
     .then(account => {
-      ctx.body = account.serialize();
-      ctx.status = 200;
+      if (account.deleted) {
+        ctx.status = 404;
+      } else {
+        ctx.body = account.serialize();
+        ctx.status = 200;
+      }
     })
     .catch(error => {
       ctx.throw(getStatusForError(error), error.message);

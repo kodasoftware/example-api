@@ -20,4 +20,12 @@ export class Auth {
     public readonly email: string,
     public readonly permissions: string[]
   ) {}
+
+  public get jwtPayload() {
+    return {
+      id: this.id,
+      email: this.email,
+      permissions: this.permissions,
+    };
+  }
 }

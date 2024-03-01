@@ -21,3 +21,15 @@ log:
 
 cors:
   origin: CORS_ORIGIN
+
+jwks:
+  publicKey: JWKS_PUBLICKEY
+
+cookie:
+  keys:
+    __name: COOKIE_KEYS
+    __format: json
+  access:
+    expiry: COOKIE_ACCESS_EXPIRY
+  refresh:
+    expiry: COOKIE_REFRESH_EXPIRY

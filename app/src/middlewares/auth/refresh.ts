@@ -11,7 +11,7 @@ export function refreshAuthMiddlewareFactory(config: {
   accessToken: { expiry: number };
   refreshToken: { expiry: number };
 }): Middleware<
-  { accessToken: string },
+  { accessToken: string; expiry: string },
   { auth: AuthService; db: Database; jwt: JwtService }
 > {
   return async function refeshAuthMiddleware(ctx) {
@@ -19,15 +19,16 @@ export function refreshAuthMiddlewareFactory(config: {
       const oldRefreshToken = ctx.cookies.get('refreshToken');
       if (!oldRefreshToken) ctx.throw(401, 'Invalid auth');
 
-      const { accessToken, refreshToken } =
+      const { accessToken, refreshToken, expiry } =
         await ctx.services.jwt.getJwtFromRefreshToken(oldRefreshToken!)(
           ctx.services.db.connection
         );
 
-      ctx.body = { accessToken };
+      ctx.body = { accessToken, expiry: expiry.toISOString() };
       ctx.cookies.set('accessToken', accessToken, {
         signed: true,
         sameSite: true,
+        httpOnly: false,
         maxAge: config.accessToken.expiry,
       });
       ctx.cookies.set('refreshToken', refreshToken, {
@@ -39,6 +40,12 @@ export function refreshAuthMiddlewareFactory(config: {
       ctx.status = 200;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+      ctx.cookies.set('refreshToken', '', {
+        signed: true,
+        sameSite: true,
+        httpOnly: true,
+        maxAge: -1,
+      });
       ctx.throw(getStatusForError(error), error?.message);
     }
   };
